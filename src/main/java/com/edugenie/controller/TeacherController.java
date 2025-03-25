@@ -2,6 +2,7 @@ package com.edugenie.controller;
 
 import com.edugenie.model.Teacher;
 import com.edugenie.service.TeacherService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,14 +10,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/teachers")
+@RequiredArgsConstructor
 public class TeacherController {
+
     private final TeacherService teacherService;
 
-    public TeacherController(TeacherService teacherService) {
-        this.teacherService = teacherService;
-    }
-
-    // 🔹 2. 개별 조회 (GET)
     @GetMapping("/{id}")
     public ResponseEntity<Teacher> getTeacherById(@PathVariable Long id) {
         Optional<Teacher> teacher = teacherService.getTeacherById(id);
@@ -24,13 +22,11 @@ public class TeacherController {
                       .orElse(ResponseEntity.notFound().build());
     }
 
-    // 🔹 3. 새로운 데이터 추가 (POST)
     @PostMapping("/")
     public Teacher createTeacher(@RequestBody Teacher teacher) {
         return teacherService.createTeacher(teacher);
     }
 
-    // 🔹 4. 데이터 수정 (PUT)
     @PutMapping("/{id}")
     public ResponseEntity<Teacher> updateTeacher(@PathVariable Long id, @RequestBody Teacher newTeacherData) {
         try {
@@ -41,7 +37,6 @@ public class TeacherController {
         }
     }
 
-    // 🔹 5. 데이터 삭제 (DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTeacher(@PathVariable Long id) {
         teacherService.deleteTeacher(id);

@@ -1,21 +1,32 @@
 package com.edugenie.service;
 
-import com.edugenie.model.*;
-import com.edugenie.repository.*;
+import com.edugenie.model.Quiz;
+import com.edugenie.model.QuizSet;
+import com.edugenie.model.Subject;
+import com.edugenie.model.Unit;
+import com.edugenie.repository.QuizRepository;
+import com.edugenie.repository.QuizSetRepository;
+import com.edugenie.repository.SubjectRepository;
+import com.edugenie.repository.UnitRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class QuizGeneratorService {
+
     private static final Logger logger = LoggerFactory.getLogger(QuizGeneratorService.class);
 
     @Value("${openai.api.key}")
@@ -25,22 +36,8 @@ public class QuizGeneratorService {
     private final UnitRepository unitRepository;
     private final QuizSetRepository quizSetRepository;
     private final QuizRepository quizRepository;
-    private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper;
-
-    @Autowired
-    public QuizGeneratorService(
-            SubjectRepository subjectRepository,
-            UnitRepository unitRepository,
-            QuizSetRepository quizSetRepository,
-            QuizRepository quizRepository) {
-        this.subjectRepository = subjectRepository;
-        this.unitRepository = unitRepository;
-        this.quizSetRepository = quizSetRepository;
-        this.quizRepository = quizRepository;
-        this.restTemplate = new RestTemplate();
-        this.objectMapper = new ObjectMapper();
-    }
 
     @Transactional
     public void generateHistoryQuizzes(Unit unit) {

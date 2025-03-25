@@ -2,18 +2,16 @@ package com.edugenie.controller;
 
 import com.edugenie.model.Subject;
 import com.edugenie.service.SubjectService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/subjects")
-@CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class SubjectController {
-    private final SubjectService subjectService;
 
-    public SubjectController(SubjectService subjectService) {
-        this.subjectService = subjectService;
-    }
+    private final SubjectService subjectService;
 
     @GetMapping
     public List<Subject> getAllSubjects() {

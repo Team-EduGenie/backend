@@ -4,23 +4,20 @@ import com.edugenie.model.Student;
 import com.edugenie.model.Teacher;
 import com.edugenie.service.StudentService;
 import com.edugenie.service.TeacherService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class StudentController {
 
-    @Autowired
-    private StudentService studentService;
-
-    @Autowired
-    private TeacherService teacherService;
+    private final StudentService studentService;
+    private final TeacherService teacherService;
 
     @GetMapping("/students")
     public List<Student> getStudentAll() {

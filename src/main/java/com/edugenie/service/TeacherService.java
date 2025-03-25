@@ -2,19 +2,17 @@ package com.edugenie.service;
 
 import com.edugenie.model.Teacher;
 import com.edugenie.repository.TeacherRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class TeacherService {
+
     private final TeacherRepository teacherRepository;
     
-
-    public TeacherService(TeacherRepository teacherRepository) {
-        this.teacherRepository = teacherRepository;
-    }
-
     // 선생님 이름으로 조회
     public Optional<Teacher> getTeacherByName(String teacherName) {
         return teacherRepository.findByTeacherName(teacherName);

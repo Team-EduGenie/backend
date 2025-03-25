@@ -4,12 +4,11 @@ import com.edugenie.model.Quiz;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
+
     List<Quiz> findByQuizSet_QuizsetId(Long quizsetId);
 
     @Query(value = """
@@ -31,4 +30,4 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
         ORDER BY qs.quiz_diff
         """, nativeQuery = true)
     List<Object[]> findQuizSetCountsByDifficulty(@Param("unitId") Long unitId);
-} 
+}

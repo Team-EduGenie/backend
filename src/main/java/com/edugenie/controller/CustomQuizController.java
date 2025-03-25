@@ -2,21 +2,16 @@ package com.edugenie.controller;
 
 import com.edugenie.dto.QuizDto;
 import com.edugenie.service.CustomQuizService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/custom-quiz")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequiredArgsConstructor
 public class CustomQuizController {
 
     private final CustomQuizService customQuizService;
-
-    @Autowired
-    public CustomQuizController(CustomQuizService customQuizService) {
-        this.customQuizService = customQuizService;
-    }
 
     @GetMapping("/generate")
     public ResponseEntity<QuizDto> generateQuiz(@RequestParam(defaultValue = "riddle") String type) {

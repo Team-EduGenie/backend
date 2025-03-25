@@ -11,16 +11,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/quizzes")
-@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class QuizController {
     
     private final QuizService quizService;
 
     @GetMapping
-    public ResponseEntity<List<Quiz>> getQuizzes(
-            @RequestParam Long studentId,
-            @RequestParam Long unitId) {
+    public ResponseEntity<List<Quiz>> getQuizzes(@RequestParam Long studentId, @RequestParam Long unitId) {
         try {
             List<Quiz> quizzes = quizService.getQuizzesByUnitAndDifficulty(studentId, unitId);
             return ResponseEntity.ok(quizzes);

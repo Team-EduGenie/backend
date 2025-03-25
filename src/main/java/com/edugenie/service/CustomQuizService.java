@@ -1,28 +1,30 @@
 package com.edugenie.service;
 
 import com.edugenie.dto.QuizDto;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CustomQuizService {
 
     @Value("${openai.api.key}")
     private String apiKey;
     
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     public QuizDto generateQuiz(String type) {
         OpenAiService service = new OpenAiService(apiKey);
-        
+
         String prompt;
         if ("cooking".equals(type)) {
             prompt = "당신은 요리사 선생님입니다. 8살 아이들에게 요리 과정을 재미있게 익히도록, 다음과 같은 형식으로 퀴즈를 만들어주세요:\n" +

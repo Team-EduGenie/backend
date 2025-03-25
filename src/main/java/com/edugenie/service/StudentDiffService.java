@@ -2,20 +2,20 @@ package com.edugenie.service;
 
 import com.edugenie.model.StudentDiff;
 import com.edugenie.repository.StudentDiffRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class StudentDiffService {
-    
-    @Autowired
-    private StudentDiffRepository studentDiffRepository;
+
+    private final StudentDiffRepository studentDiffRepository;
 
     @Transactional(readOnly = true)
     public int getStudentDiff(Long studentId, Long unitId) {

@@ -1,21 +1,20 @@
 package com.edugenie.controller;
 
 import com.edugenie.service.StudentDiffService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/student-diff")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequiredArgsConstructor
 public class StudentDiffController {
 
-    @Autowired
-    private StudentDiffService studentDiffService;
+    private final StudentDiffService studentDiffService;
 
     @PostMapping("/increment-score")
     public ResponseEntity<Void> incrementScore(@RequestBody Map<String, Long> request) {

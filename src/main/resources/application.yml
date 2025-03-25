@@ -7,6 +7,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
 openai:
   api:
     key: ${OPEN_AI_API_KEY}
@@ -28,3 +29,6 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+
+frontend:
+  url: ${LOCAL_FRONTEND_URL}

@@ -11,6 +11,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class QuizService {
+
     private final QuizRepository quizRepository;
     private final StudentDiffService studentDiffService;
 

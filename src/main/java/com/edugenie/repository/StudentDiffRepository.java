@@ -5,12 +5,11 @@ import com.edugenie.model.StudentDiffId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface StudentDiffRepository extends JpaRepository<StudentDiff, StudentDiffId> {
+
     StudentDiff findByStudentIdAndUnitId(Long studentId, Long unitId);
 
     @Query(value = """
