@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/custom-quiz")
+@RequestMapping("/api/v1/custom-quiz")
 @RequiredArgsConstructor
 public class CustomQuizController {
 

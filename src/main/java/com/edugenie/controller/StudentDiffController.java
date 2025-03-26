@@ -10,52 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/student-diff")
+@RequestMapping("/api/v1/student-diff")
 @RequiredArgsConstructor
 public class StudentDiffController {
 
     private final StudentDiffService studentDiffService;
 
-    @PostMapping("/increment-score")
-    public ResponseEntity<Void> incrementScore(@RequestBody Map<String, Long> request) {
-        try {
-            Long studentId = request.get("studentId");
-            Long unitId = request.get("unitId");
-            
-            if (studentId == null || unitId == null) {
-                return ResponseEntity.badRequest().build();
-            }
-            
-            studentDiffService.incrementScore(studentId, unitId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping("/reset-score")
-    public ResponseEntity<Void> resetScore(@RequestBody Map<String, Long> request) {
-        try {
-            Long studentId = request.get("studentId");
-            Long unitId = request.get("unitId");
-            
-            if (studentId == null || unitId == null) {
-                return ResponseEntity.badRequest().build();
-            }
-            
-            studentDiffService.resetScore(studentId, unitId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
     @GetMapping("/score")
-    public ResponseEntity<Map<String, Integer>> getScore(
-            @RequestParam Long studentId,
-            @RequestParam Long unitId) {
+    public ResponseEntity<Map<String, Integer>> getScore(@RequestParam Long studentId, @RequestParam Long unitId) {
         try {
             int score = studentDiffService.getScore(studentId, unitId);
             int difficulty = studentDiffService.getStudentDiff(studentId, unitId);
@@ -76,10 +38,44 @@ public class StudentDiffController {
     }
 
     @GetMapping("/teacher/{teacherId}/subject/{subjectId}")
-    public ResponseEntity<List<Map<String, Object>>> getScoresByTeacherAndSubject(
-            @PathVariable Long teacherId,
-            @PathVariable Long subjectId) {
+    public ResponseEntity<List<Map<String, Object>>> getScoresByTeacherAndSubject(@PathVariable Long teacherId, @PathVariable Long subjectId) {
         List<Map<String, Object>> scores = studentDiffService.getScoresByTeacherIdAndSubjectId(teacherId, subjectId);
         return ResponseEntity.ok(scores);
     }
-} 
+
+    @PostMapping("/increment-score")
+    public ResponseEntity<Void> incrementScore(@RequestBody Map<String, Long> request) {
+        try {
+            Long studentId = request.get("studentId");
+            Long unitId = request.get("unitId");
+
+            if (studentId == null || unitId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            studentDiffService.incrementScore(studentId, unitId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/reset-score")
+    public ResponseEntity<Void> resetScore(@RequestBody Map<String, Long> request) {
+        try {
+            Long studentId = request.get("studentId");
+            Long unitId = request.get("unitId");
+
+            if (studentId == null || unitId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            studentDiffService.resetScore(studentId, unitId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+}

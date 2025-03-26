@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/quiz-generator")
+@RequestMapping("/api/v1/quiz-generator")
 @RequiredArgsConstructor
 public class QuizGeneratorController {
 

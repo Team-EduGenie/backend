@@ -12,24 +12,24 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/students")
 @RequiredArgsConstructor
 public class StudentController {
 
     private final StudentService studentService;
     private final TeacherService teacherService;
 
-    @GetMapping("/students")
+    @GetMapping
     public List<Student> getStudentAll() {
         return studentService.getAllStudents();
     }
 
-    @GetMapping("/students/teacher/{teacherId}")
+    @GetMapping("/teacher/{teacherId}")
     public List<Student> getStudentsByTeacherId(@PathVariable Long teacherId) {
         return studentService.getStudentsByTeacherId(teacherId);
     }
 
-    @PostMapping("/students")
+    @PostMapping
     public Student addStudent(@RequestBody Student student) {
         Teacher teacher = teacherService.getTeacherById(student.getTeacher().getTeacherId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid teacher ID"));
@@ -37,12 +37,12 @@ public class StudentController {
         return studentService.addStudent(student);
     }
 
-    @DeleteMapping("/students/{id}")
+    @DeleteMapping("/{id}")
     public void deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
     }
 
-    @PostMapping("/students/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String studentName = request.get("student_name");
         return studentService.login(studentName)
