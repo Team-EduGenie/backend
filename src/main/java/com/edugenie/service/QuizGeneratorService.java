@@ -1,26 +1,18 @@
 package com.edugenie.service;
 
-import com.edugenie.model.Quiz;
-import com.edugenie.model.QuizSet;
-import com.edugenie.model.Subject;
-import com.edugenie.model.Unit;
-import com.edugenie.repository.QuizRepository;
-import com.edugenie.repository.QuizSetRepository;
-import com.edugenie.repository.SubjectRepository;
-import com.edugenie.repository.UnitRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -32,155 +24,85 @@ public class QuizGeneratorService {
     @Value("${openai.api.key}")
     private String apiKey;
 
-    private final SubjectRepository subjectRepository;
-    private final UnitRepository unitRepository;
-    private final QuizSetRepository quizSetRepository;
-    private final QuizRepository quizRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper;
 
-    @Transactional
-    public void generateHistoryQuizzes(Unit unit) {
+    public void generateQuizzesFromPDF(String pdfPath, String subjectName) {
         try {
-            // OpenAI API 엔드포인트
-            String url = "https://api.openai.com/v1/chat/completions";
-
-            // API 요청 헤더 설정
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(apiKey);
-
-            // 프롬프트 설정
-            String prompt = "당신은 역사 교육 전문가입니다. 다음 조건에 맞는 한국사 문제를 만들어주세요:\n\n" +
-                    "1. 문제 형식:\n" +
-                    "   - 각 난이도별로 정확히 3개의 객관식 문제 생성 (총 15문제)\n" +
-                    "   - 반드시 각 난이도마다 3개씩 문제를 생성해야 함\n" +
-                    "   - 모든 문제는 5지선다형\n" +
-                    "   - 답은 반드시 1~5 사이의 숫자로만 표시 (보기의 번호)\n" +
-                    "   - 모든 문제는 반드시 하나의 명확한 답만 있어야 함\n\n" +
-                    "2. 난이도 설명:\n" +
-                    "   - 난이도 1 (3문제): 초등 저학년 수준 (예: '신라의 수도는 어디였나요?')\n" +
-                    "   - 난이도 2 (3문제): 초등 중학년 수준 (예: '고구려의 가장 유명한 왕은 누구인가요?')\n" +
-                    "   - 난이도 3 (3문제): 초등 고학년 수준 (예: '고려의 대표적인 무역항은 어디였나요?')\n" +
-                    "   - 난이도 4 (3문제): 중학생 수준 (예: '조선 세종 때 만들어진 한글의 제작 원리는?')\n" +
-                    "   - 난이도 5 (3문제): 고등학생 수준 (예: '임진왜란 당시 조선의 외교 전략은?')\n\n" +
-                    "3. 주제 다양성:\n" +
-                    "   - 시대별로 골고루 분포 (고조선, 삼국, 통일신라, 고려, 조선)\n" +
-                    "   - 정치, 경제, 문화, 과학, 예술 등 다양한 분야 포함\n" +
-                    "   - 같은 난이도 내에서도 서로 다른 시대나 주제를 다룰 것\n\n" +
-                    "4. JSON 형식으로 응답:\n" +
-                    "[\n" +
-                    "  {\n" +
-                    "    \"question\": \"문제\",\n" +
-                    "    \"type\": \"objective\",\n" +
-                    "    \"options\": [\"보기1\", \"보기2\", \"보기3\", \"보기4\", \"보기5\"],\n" +
-                    "    \"answer\": \"1~5 중 정답 번호\",\n" +
-                    "    \"difficulty\": 난이도(1-5)\n" +
-                    "  }\n" +
-                    "]\n\n" +
-                    "5. 추가 요구사항:\n" +
-                    "   - 보기는 실제 역사적 사실을 바탕으로 구성\n" +
-                    "   - 각 난이도에 맞는 어휘와 개념 사용\n" +
-                    "   - 보기의 길이는 최대한 비슷하게 구성\n" +
-                    "   - 정답은 반드시 1~5 사이의 숫자로만 표시할 것";
-
-            // API 요청 바디 생성
-            Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("model", "gpt-4");
-            requestBody.put("messages", Arrays.asList(
-                Map.of("role", "system", "content", "당신은 학습자의 수준과 이해도에 맞춰 한국사 문제를 제작하는 전문가입니다. 각 난이도별로 적절한 개념과 용어를 사용하여 학습 효과를 최대화하는 문제를 만들어주세요. 반드시 검증된 역사적 사실에 기반하여 문제를 출제해주세요."),
-                Map.of("role", "user", "content", prompt)
-            ));
-            requestBody.put("temperature", 0.3);
-
-            // API 요청
-            HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-
-            // 응답 처리
-            if (response.getBody() != null && response.getBody().get("choices") != null) {
-                List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
-                if (!choices.isEmpty()) {
-                    String content = (String) ((Map)choices.get(0).get("message")).get("content");
-                    logger.info("GPT 응답 원본: {}", content);
-                    
-                    // 마크다운 포맷팅 제거
-                    content = content.replaceAll("```json\\s*", "")
-                                   .replaceAll("```\\s*$", "")
-                                   .trim();
-                    logger.info("포맷팅 제거 후: {}", content);
-                    
-                    List<Map<String, Object>> allQuizzes = objectMapper.readValue(content, List.class);
-                    logger.info("파싱된 퀴즈 개수: {}", allQuizzes.size());
-
-                    // 난이도별로 퀴즈 분류
-                    Map<Integer, List<Map<String, Object>>> quizzesByDifficulty = new HashMap<>();
-                    for (Map<String, Object> quiz : allQuizzes) {
-                        int difficulty = ((Number) quiz.get("difficulty")).intValue();
-                        quizzesByDifficulty.computeIfAbsent(difficulty, k -> new ArrayList<>()).add(quiz);
-                    }
-
-                    // 각 난이도별로 퀴즈 세트 생성
-                    for (int difficulty = 1; difficulty <= 5; difficulty++) {
-                        List<Map<String, Object>> difficultyQuizzes = quizzesByDifficulty.get(difficulty);
-                        if (difficultyQuizzes != null && !difficultyQuizzes.isEmpty()) {
-                            // 퀴즈 세트 생성
-                            QuizSet quizSet = new QuizSet();
-                            quizSet.setUnit(unit);
-                            quizSet.setQuizName(String.format("사회_역사_난이도%d", difficulty));
-                            quizSet.setQuizDiff(difficulty);
-                            quizSetRepository.save(quizSet);
-
-                            // 해당 난이도의 퀴즈 3개만 저장
-                            for (int i = 0; i < Math.min(3, difficultyQuizzes.size()); i++) {
-                                Map<String, Object> quizData = difficultyQuizzes.get(i);
-                                Quiz quiz = new Quiz();
-                                String question = (String) quizData.get("question");
-                                
-                                // 객관식 문제인 경우 보기도 포함
-                                if ("objective".equals(quizData.get("type"))) {
-                                    List<String> options = (List<String>) quizData.get("options");
-                                    question += "\n\n보기:\n";
-                                    for (int j = 0; j < options.size(); j++) {
-                                        question += (j + 1) + ". " + options.get(j) + "\n";
-                                    }
-                                }
-                                
-                                quiz.setProblem(question);
-                                quiz.setRightAnswer(quizData.get("answer").toString());
-                                quiz.setQuizSet(quizSet);
-                                quizRepository.save(quiz);
-                            }
-                        }
-                    }
-                }
-            }
+            String content = extractTextFromPDF(pdfPath);
+            generateQuizzesFromText(content, subjectName);
         } catch (Exception e) {
-            logger.error("역사 퀴즈 생성 중 오류 발생: ", e);
-            throw new RuntimeException("역사 퀴즈 생성에 실패했습니다.", e);
+            logger.error("PDF based quiz generation error: ", e);
+            throw new RuntimeException("Failed to generate quiz from PDF.", e);
         }
     }
 
-    @Transactional
-    public void initializeSubjectsAndUnits() {
-        // 사회 과목 생성 또는 조회
-        Subject socialStudies = subjectRepository.findBySubjectName("사회")
-                .orElseGet(() -> {
-                    Subject newSubject = new Subject();
-                    newSubject.setSubjectName("사회");
-                    return subjectRepository.save(newSubject);
-                });
-
-        // 역사 단원 생성 또는 조회
-        Unit historyUnit = unitRepository.findByUnitNameAndSubject("역사", socialStudies)
-                .orElseGet(() -> {
-                    Unit newUnit = new Unit();
-                    newUnit.setUnitName("역사");
-                    newUnit.setSubject(socialStudies);
-                    return unitRepository.save(newUnit);
-                });
-
-        // 역사 문제 생성
-        generateHistoryQuizzes(historyUnit);
+    private String extractTextFromPDF(String pdfPath) throws IOException {
+        File file = new File(pdfPath);
+        try (PDDocument document = PDDocument.load(file)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document);
+        }
     }
-} 
+
+    private void generateQuizzesFromText(String content, String subjectName) {
+        // 텍스트를 2000자 단위로 나누기
+        int chunkSize = 2000;
+        List<String> chunks = new ArrayList<>();
+        for (int i = 0; i < content.length(); i += chunkSize) {
+            chunks.add(content.substring(i, Math.min(i + chunkSize, content.length())));
+        }
+
+        // 각 청크별로 퀴즈 생성
+        for (String chunk : chunks) {
+            generateQuizzesForChunk(chunk, subjectName);
+        }
+    }
+
+    private void generateQuizzesForChunk(String chunk, String subjectName) {
+        String url = "https://api.openai.com/v1/chat/completions";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
+
+        Map<String, Object> message = new HashMap<>();
+        message.put("role", "user");
+        message.put("content", "이 PDF는 '" + subjectName + "' 과목/시험을 위한 교육과정 문서입니다.\n\n" +
+                "이 문서를 참고하여 **학생들이 배워야 할 내용과 성취해야 할 역량**을 기반으로 다음 조건에 맞는 5지선다형 문제를 **정확히 10개**만 만들어주세요.\n\n" +
+                "문제는 단순한 암기 테스트가 아니라, 실제로 학생들이 배운 내용을 바탕으로 사고력과 이해도를 평가할 수 있어야 합니다.\n" +
+                "각 문항은 다음 기준 중 하나를 반영해 구성해주세요:\n" +
+                "1. 성취기준에서 요구하는 지식, 기능, 태도 중 하나를 평가하는 문항\n" +
+                "2. 특정 학년 또는 과목에서 배우는 핵심 개념의 적용을 요구하는 문항\n" +
+                "3. 실제 수업에서 사용할 수 있도록 구성된 상황형 문항 (예: 사례 제시 → 선택)\n\n" +
+                "각 문항은 아래 JSON 형식으로 출력해주세요:\n" +
+                "{\n" +
+                "  \"문제들\": [\n" +
+                "    {\n" +
+                "      \"난이도\": \"쉬움/중간/어려움\",\n" +
+                "      \"문제\": \"학생을 대상으로 한 교육과정 기반 문항 내용\",\n" +
+                "      \"보기\": [\"보기1\", \"보기2\", \"보기3\", \"보기4\", \"보기5\"],\n" +
+                "      \"정답\": \"정답 번호(1-5)\",\n" +
+                "      \"관련 성취기준\": \"해당되는 성취기준 혹은 교육목표 요약\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n\n" +
+                "PDF에서 발췌한 텍스트:\n" + chunk);
+
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("model", "gpt-4-1106-preview");
+        requestBody.put("messages", List.of(message));
+        requestBody.put("temperature", 0.7);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+
+        List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
+        if (!choices.isEmpty()) {
+            Map<String, Object> choice = choices.get(0);
+            Map<String, Object> messageResponse = (Map<String, Object>) choice.get("message");
+            String text = (String) messageResponse.get("content");
+            logger.info("생성된 퀴즈: {}", text);
+        }
+    }
+}
