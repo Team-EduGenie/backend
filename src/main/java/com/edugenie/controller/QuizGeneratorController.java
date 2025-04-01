@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/quiz-generator")
@@ -22,23 +21,21 @@ public class QuizGeneratorController {
     public ResponseEntity<?> generateQuizzesFromPDF(@RequestBody Map<String, Object> request) {
         try {
             String subjectName = (String) request.get("subjectName");
-            List<String> attachmentNames = (List<String>) request.get("attachmentNames");
+            String attachmentName = (String) request.get("attachmentNames");
             
-            if (attachmentNames == null || attachmentNames.isEmpty()) {
+            if (attachmentName == null || attachmentName.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
                     "message", "첨부 파일이 없습니다."
                 ));
             }
-
-            // 첫 번째 파일만 처리
-            String fileName = attachmentNames.get(0);
-            File pdfFile = new File(PDF_DIRECTORY + fileName);
+            
+            File pdfFile = new File(PDF_DIRECTORY + attachmentName);
             
             if (!pdfFile.exists()) {
                 return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", "파일을 찾을 수 없습니다: " + fileName
+                    "message", "파일을 찾을 수 없습니다: " + attachmentName
                 ));
             }
 
