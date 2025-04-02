@@ -1,7 +1,8 @@
 package com.edugenie.quiz.controller;
 
-import com.edugenie.quiz.controller.dto.QuizAddRequest;
+import com.edugenie.quiz.controller.dto.QuizGenerateRequest;
 import com.edugenie.quiz.service.QuizService;
+import com.edugenie.quiz.service.dto.QuizAnswerResult;
 import com.edugenie.quiz.service.dto.QuizResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,14 @@ public class QuizController {
         return ResponseEntity.ok(results);
     }
 
+    @GetMapping("/answer")
+    public ResponseEntity<List<QuizAnswerResult>> quizAnswerList(@RequestParam List<Long> quizIds) {
+        List<QuizAnswerResult> results = quizService.findQuizAnswers(quizIds);
+        return ResponseEntity.ok(results);
+    }
+
     @PostMapping
-    public ResponseEntity<Void> quizAdd(@RequestBody QuizAddRequest request) {
+    public ResponseEntity<Void> quizGenerate(@RequestBody QuizGenerateRequest request) {
         quizService.generateQuiz(request);
         return ResponseEntity.ok().build();
     }

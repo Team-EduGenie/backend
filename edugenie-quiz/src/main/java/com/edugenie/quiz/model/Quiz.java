@@ -24,7 +24,7 @@ public class Quiz {
     private String options;
 
     @Column(nullable = false)
-    private String answer;
+    private Integer answer;
 
     @Column(nullable = false)
     private String explanation;

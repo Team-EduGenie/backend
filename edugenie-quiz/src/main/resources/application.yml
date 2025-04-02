@@ -11,12 +11,15 @@ spring:
   cloud:
     stream:
       bindings:
-        inputChannel-in-0:
+        quizSet-in-0:
+          destination: quiz-set
+          group: quiz
+        submission-out-0:
+          destination: achievement
+          group: quiz
+        quizGenerator-out-0:
           destination: ai
           group: quiz
-      kafka:
-        binder:
-          brokers: localhost:9092
 
 ---
 
@@ -35,6 +38,10 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+  cloud:
+    stream:
+      kafka:
+        brokers: ${KAFKA_BROKER_URL}
 
 frontend:
   url: ${LOCAL_FRONTEND_URL}
