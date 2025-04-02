@@ -1,0 +1,50 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: edugenie-quiz
+  profiles:
+    default: local
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  cloud:
+    stream:
+      bindings:
+        quizSet-in-0:
+          destination: quiz-set
+          group: quiz
+        submission-out-0:
+          destination: achievement
+          group: quiz
+        quizGenerator-out-0:
+          destination: ai
+          group: quiz
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://${LOCAL_POSTGRESQL_HOST}:${LOCAL_POSTGRESQL_PORT}/${LOCAL_POSTGRESQL_DATABASE}
+    username: ${LOCAL_POSTGRESQL_USERNAME}
+    password: ${LOCAL_POSTGRESQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+  cloud:
+    stream:
+      kafka:
+        brokers: ${KAFKA_BROKER_URL}
+
+frontend:
+  url: ${LOCAL_FRONTEND_URL}

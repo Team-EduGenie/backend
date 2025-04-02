@@ -1,0 +1,78 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: edugenie-gateway
+  profiles:
+    default: local
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: true
+        all-namespaces: true
+      loadbalancer:
+        mode: service
+    gateway:
+      routes:
+        - id: quiz-service
+          uri: lb://quiz-service
+          predicates:
+            - Path=/attachments/**
+            - Path=/quizzes/**
+            - Path=/subjects/**
+          filters:
+            - StripPrefix=3
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/groups/**
+            - Path=/users/**
+          filters:
+            - StripPrefix=3
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOriginPatterns:
+              - "*"
+            allow-credentials: true
+            allowedHeaders: "*"
+            allowedMethods:
+              - PUT
+              - GET
+              - POST
+              - DELETE
+              - PATCH
+              - OPTIONS
+            exposed-headers:
+              - Authorization
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://${LOCAL_POSTGRESQL_HOST}:${LOCAL_POSTGRESQL_PORT}/${LOCAL_POSTGRESQL_DATABASE}
+    username: ${LOCAL_POSTGRESQL_USERNAME}
+    password: ${LOCAL_POSTGRESQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+frontend:
+  url: ${LOCAL_FRONTEND_URL}
