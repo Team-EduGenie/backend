@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -29,14 +29,6 @@ public class UserController {
         userService.addUser(request);
         return ResponseEntity.ok().build();
     }
-
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-//        String studentName = request.get("student_name");
-//        return userService.login(studentName)
-//                .map(ResponseEntity::ok)
-//                .orElse(ResponseEntity.notFound().build());
-//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
