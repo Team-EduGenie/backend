@@ -1,0 +1,48 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: achievement
+  profiles:
+    default: local
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  cloud:
+    stream:
+      bindings:
+        submissionChannel-in-0:
+          destination: achievement
+          group: achievement
+      kafka:
+        binder:
+          brokers: localhost:9092
+
+internal-service:
+  host: localhost
+  quiz:
+    port: 8080
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://${LOCAL_POSTGRESQL_HOST}:${LOCAL_POSTGRESQL_PORT}/${LOCAL_POSTGRESQL_DATABASE}
+    username: ${LOCAL_POSTGRESQL_USERNAME}
+    password: ${LOCAL_POSTGRESQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+frontend:
+  url: ${LOCAL_FRONTEND_URL}
