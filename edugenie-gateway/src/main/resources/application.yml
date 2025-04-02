@@ -11,6 +11,51 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: true
+        all-namespaces: true
+      loadbalancer:
+        mode: service
+    gateway:
+      routes:
+        - id: quiz-service
+          uri: lb://quiz-service
+          predicates:
+            - Path=/attachments/**
+            - Path=/quizzes/**
+            - Path=/subjects/**
+          filters:
+            - StripPrefix=3
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/groups/**
+            - Path=/users/**
+          filters:
+            - StripPrefix=3
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOriginPatterns:
+              - "*"
+            allow-credentials: true
+            allowedHeaders: "*"
+            allowedMethods:
+              - PUT
+              - GET
+              - POST
+              - DELETE
+              - PATCH
+              - OPTIONS
+            exposed-headers:
+              - Authorization
+
 ---
 
 spring:
