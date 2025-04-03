@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
 
+    List<Group> findByGroupNameContaining(String groupName);
+
     Page<Group> findByGroupNameContaining(String groupName, Pageable pageable);
 
     @Query("SELECT g FROM Group g JOIN FETCH g.userGroups ug " +

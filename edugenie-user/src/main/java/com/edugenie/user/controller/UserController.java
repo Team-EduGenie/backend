@@ -3,7 +3,7 @@ package com.edugenie.user.controller;
 import com.edugenie.user.controller.dto.SignupRequest;
 import com.edugenie.user.service.GroupService;
 import com.edugenie.user.service.UserService;
-import com.edugenie.user.service.dto.GroupResult;
+import com.edugenie.user.service.dto.MyGroupResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +19,8 @@ public class UserController {
     private final GroupService groupService;
 
     @GetMapping("/{userId}/groups")
-    public ResponseEntity<List<GroupResult>> userGroupList(@PathVariable String userId) {
-        List<GroupResult> results = groupService.findUserGroups(userId);
+    public ResponseEntity<List<MyGroupResult>> userGroupList(@PathVariable String userId) {
+        List<MyGroupResult> results = groupService.findUserGroups(userId);
         return ResponseEntity.ok(results);
     }
 

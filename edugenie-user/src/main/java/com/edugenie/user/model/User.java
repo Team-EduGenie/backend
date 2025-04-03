@@ -32,6 +32,10 @@ public class User {
     private String password;
 
     @Builder.Default
+    @OneToMany(mappedBy = "leader", cascade = CascadeType.PERSIST)
+    private List<Group> managedGroups = new ArrayList<>();
+
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
     private List<UserGroup> userGroups = new ArrayList<>();
 
