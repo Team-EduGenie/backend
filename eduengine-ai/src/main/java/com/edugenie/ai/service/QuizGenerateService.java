@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,9 +38,10 @@ public class QuizGenerateService {
     public void generateQuizzesFromPDF(QuizGenerateRequest request) {
         try {
             StringBuilder contents = new StringBuilder();
-            for (String url : request.attachmentUrls()) {
-                contents.append(extractTextFromPDF(url)).append("\n");
-            }
+//            for (String url : request.attachmentUrls()) {
+//                contents.append(extractTextFromPDF(url)).append("\n");
+//            }
+            contents.append(extractTextFromPDF("test")).append("\n");
             generateQuizzesFromText(contents.toString(), request.subjectName());
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate quiz from PDF.", e);
@@ -48,7 +50,16 @@ public class QuizGenerateService {
 
     private String extractTextFromPDF(String pdfPath) throws IOException {
         // TODO: blob storage에서 파일 추출
-        File file = new File(pdfPath);
+//        File file = Paths.get("../pdf/test.pdf").toFile();
+//        System.out.println("file size: " + file.length());
+
+        ClassLoader classLoader = QuizGenerateService.class.getClassLoader();
+        URL resource = classLoader.getResource("pdf/test.pdf");
+        if (resource == null) {
+            throw new IllegalArgumentException("파일을 찾을 수 없습니다.");
+        }
+
+        File file = new File(resource.getFile());
         try (PDDocument document = PDDocument.load(file)) {
             PDFTextStripper stripper = new PDFTextStripper();
             return stripper.getText(document);

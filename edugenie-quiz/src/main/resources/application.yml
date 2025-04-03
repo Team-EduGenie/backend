@@ -15,7 +15,7 @@ spring:
     stream:
       bindings:
         quizSet-in-0:
-          destination: quiz-set
+          destination: quizSet
           group: quiz
         submission-out-0:
           destination: achievement

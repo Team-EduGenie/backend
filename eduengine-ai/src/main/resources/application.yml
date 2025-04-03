@@ -14,10 +14,10 @@ spring:
     stream:
       bindings:
         quizGenerator-in-0:
-          destination: achievement
+          destination: ai
           group: ai
         quizSet-out-0:
-          destination: quiz-set
+          destination: quizSet
           group: ai
       kafka:
         binder:

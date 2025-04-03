@@ -34,7 +34,10 @@ public class QuizService {
 
     @Transactional
     public void addQuizzes(QuizSet quizSet) {
-        Subject subject = subjectRepository.findById(quizSet.subjectId())
+        // TODO: subjectId를 quizSet에서 가져오도록 수정
+//        Subject subject = subjectRepository.findById(quizSet.subjectId())
+//                .orElseThrow(() -> new IllegalArgumentException("Subject not found"));
+        Subject subject = subjectRepository.findById(1L)
                 .orElseThrow(() -> new IllegalArgumentException("Subject not found"));
         List<Quiz> quizzes = quizSet.questions().stream()
                 .map(question -> QuizSet.toEntity(subject, question)).toList();

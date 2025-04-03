@@ -14,7 +14,7 @@ public class KafkaService {
     private final QuizGenerateService quizGenerateService;
 
     @Bean
-    public Consumer<QuizGenerateRequest> submissionChannel() {
+    public Consumer<QuizGenerateRequest> quizGenerator() {
         return quizGenerateService::generateQuizzesFromPDF;
     }
 }
