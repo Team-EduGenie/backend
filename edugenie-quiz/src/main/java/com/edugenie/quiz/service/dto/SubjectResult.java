@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Builder
 public record SubjectResult(
         Long id,
-        String subjectName,
+        String name,
         String description,
         // TODO
         Boolean isCreatedByLeader,
@@ -18,7 +18,7 @@ public record SubjectResult(
     public static SubjectResult fromEntity(Subject subject) {
         return SubjectResult.builder()
                 .id(subject.getId())
-                .subjectName(subject.getTitle())
+                .name(subject.getTitle())
                 .description(subject.getDescription())
                 .build();
     }

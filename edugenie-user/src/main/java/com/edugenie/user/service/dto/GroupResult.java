@@ -5,15 +5,15 @@ import lombok.Builder;
 
 @Builder
 public record GroupResult(
-        Long groupId,
-        String groupName,
+        Long id,
+        String name,
         String description
 ) {
 
     public static GroupResult fromEntity(Group group) {
         return GroupResult.builder()
-                .groupId(group.getId())
-                .groupName(group.getGroupName())
+                .id(group.getId())
+                .name(group.getGroupName())
                 .description(group.getDescription())
                 .build();
     }

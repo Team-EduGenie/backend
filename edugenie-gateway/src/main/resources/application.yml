@@ -12,30 +12,21 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   cloud:
-    kubernetes:
-      discovery:
-        enabled: true
-        all-namespaces: true
-      loadbalancer:
-        mode: service
     gateway:
       routes:
-        - id: quiz-service
-          uri: lb://quiz-service
-          predicates:
-            - Path=/attachments/**
-            - Path=/quizzes/**
-            - Path=/subjects/**
-          filters:
-            - StripPrefix=3
-
         - id: user-service
-          uri: lb://user-service
+          uri: http://localhost:8081
           predicates:
-            - Path=/groups/**
-            - Path=/users/**
+            - Path=/api/groups/**, /api/users/**, /api/auth/**
           filters:
-            - StripPrefix=3
+            - StripPrefix=1
+
+        - id: quiz-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/attachments/**, /api/quizzes/**, /api/subjects/**
+          filters:
+            - StripPrefix=1
 
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
@@ -53,8 +44,11 @@ spring:
               - DELETE
               - PATCH
               - OPTIONS
-            exposed-headers:
-              - Authorization
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.web: DEBUG
 
 ---
 

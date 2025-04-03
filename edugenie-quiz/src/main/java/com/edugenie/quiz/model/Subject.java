@@ -27,11 +27,11 @@ public class Subject {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
     private String description;
 
+    @Builder.Default
     @Column(nullable = false)
-    private Boolean isCreatedByLeader;
+    private Boolean isCreatedByLeader = true;
 
     @Builder.Default
     @OneToMany(mappedBy = "subject", cascade = CascadeType.PERSIST)

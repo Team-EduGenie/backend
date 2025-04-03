@@ -1,5 +1,6 @@
 package com.edugenie.user.model;
 
+import com.edugenie.user.controller.dto.GroupAddRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "user_groups")
+@Table(name = "groups")
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,6 +31,19 @@ public class Group {
     private String description;
 
     @Builder.Default
-    @OneToMany(mappedBy = "group", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<UserGroup> userGroups = new ArrayList<>();
+
+    public static Group create(GroupAddRequest request, String inviteCode, User user) {
+        Group group = Group.builder()
+                .groupName(request.groupName())
+                .inviteCode(inviteCode)
+                .build();
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
+        group.userGroups.add(userGroup);
+        return group;
+    }
 }

@@ -1,7 +1,7 @@
 package com.edugenie.user.controller.dto;
 
-public record GroupJoinRequest(
+public record LoginRequest(
         String userId,
-        String inviteCode
+        String password
 ) {
 }
