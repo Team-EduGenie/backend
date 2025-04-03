@@ -14,6 +14,7 @@ public record QuizResult(
         return QuizResult.builder()
                 .id(quiz.getId())
                 .question(quiz.getQuestion())
+                .options(quiz.getOptions())
                 .build();
     }
 }

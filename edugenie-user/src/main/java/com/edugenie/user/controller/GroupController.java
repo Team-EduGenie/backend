@@ -5,6 +5,7 @@ import com.edugenie.user.controller.dto.GroupJoinRequest;
 import com.edugenie.user.service.GroupService;
 import com.edugenie.user.service.dto.GroupInfoResult;
 import com.edugenie.user.service.dto.GroupResult;
+import com.edugenie.user.service.dto.MyGroupResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -27,8 +28,8 @@ public class GroupController {
     }
 
     @GetMapping("/myGroup")
-    public ResponseEntity<List<GroupResult>> myGroupList(@RequestParam String userId) {
-        List<GroupResult> results = groupService.findUserGroups(userId);
+    public ResponseEntity<List<MyGroupResult>> myGroupList(@RequestParam String userId) {
+        List<MyGroupResult> results = groupService.findUserGroups(userId);
         return ResponseEntity.ok(results);
     }
 

@@ -14,7 +14,12 @@ public class KafkaService {
     private final QuizService quizService;
 
     @Bean
-    public Consumer<QuizSet> submissionChannel() {
+    public Consumer<QuizSet> quizSet() {
         return quizService::addQuizzes;
     }
+
+//    @Bean
+//    public Consumer<QuizSet> submissionChannel() {
+//        return quizService::addQuizzes;
+//    }
 }

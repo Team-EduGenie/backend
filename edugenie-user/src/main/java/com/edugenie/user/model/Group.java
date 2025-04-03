@@ -30,6 +30,10 @@ public class Group {
 
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User leader;
+
     @Builder.Default
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<UserGroup> userGroups = new ArrayList<>();
@@ -38,6 +42,7 @@ public class Group {
         Group group = Group.builder()
                 .groupName(request.groupName())
                 .inviteCode(inviteCode)
+                .leader(user)
                 .build();
         UserGroup userGroup = UserGroup.builder()
                 .user(user)

@@ -10,13 +10,13 @@ import com.edugenie.user.repository.UserGroupRepository;
 import com.edugenie.user.repository.UserRepository;
 import com.edugenie.user.service.dto.GroupInfoResult;
 import com.edugenie.user.service.dto.GroupResult;
+import com.edugenie.user.service.dto.MyGroupResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +33,11 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<GroupResult> findUserGroups(String userId) {
+    public List<MyGroupResult> findUserGroups(String userId) {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         List<Group> groups = groupRepository.findGroupWithUserGroupByUser(user);
-        return groups.stream().map(GroupResult::fromEntity).toList();
+        return groups.stream().map(group -> MyGroupResult.fromEntity(group, user)).toList();
     }
 
     @Transactional
@@ -64,6 +64,7 @@ public class GroupService {
     }
 
     private String generateInviteCode() {
-        return String.valueOf(100000 + new Random().nextInt(900000));
+        return "000000";
+//        return String.valueOf(100000 + new Random().nextInt(900000));
     }
 }
