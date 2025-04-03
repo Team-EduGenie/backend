@@ -19,7 +19,7 @@ public class UserController {
     private final GroupService groupService;
 
     @GetMapping("/{userId}/groups")
-    public ResponseEntity<List<GroupResult>> userGroupList(@PathVariable Long userId) {
+    public ResponseEntity<List<GroupResult>> userGroupList(@PathVariable String userId) {
         List<GroupResult> results = groupService.findUserGroups(userId);
         return ResponseEntity.ok(results);
     }

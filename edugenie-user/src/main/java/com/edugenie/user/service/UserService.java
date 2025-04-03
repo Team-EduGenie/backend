@@ -34,7 +34,7 @@ public class UserService {
         if (!user.getPassword().equals(request.password())) {
             throw new RuntimeException("Invalid password");
         }
-        String accessToken = jwtUtil.generateToken(String.valueOf(user.getId()));
+        String accessToken = jwtUtil.generateToken(String.valueOf(user.getUserId()));
         return UserInfoResult.fromEntity(user, accessToken);
     }
 }

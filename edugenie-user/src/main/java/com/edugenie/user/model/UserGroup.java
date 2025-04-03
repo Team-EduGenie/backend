@@ -24,4 +24,8 @@ public class UserGroup {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
+
+    public static UserGroup join(User user, Group group) {
+        return UserGroup.builder().user(user).group(group).build();
+    }
 }
